@@ -312,6 +312,7 @@ html[data-theme="dark"] .ic-sun{display:block}
 html[dir="rtl"] .hero h1{letter-spacing:0;font-weight:700;line-height:1.24}
 html[dir="rtl"] .hero h1 b{font-weight:700}
 .hero .role{font-size:clamp(1rem,2.2vw,1.24rem);color:var(--txt2);font-weight:500;margin-bottom:8px}
+.hero .role .role-sep{color:var(--teal);opacity:.65;font-weight:400;margin-inline:10px;display:inline-block}
 .hero .hr-thin{width:55px;height:1px;background:var(--teal);margin:21px 0 21px}
 html[dir="rtl"] .hero .hr-thin{margin-left:auto;margin-right:0}
 .hero .lede{color:var(--muted);font-size:1rem;max-width:575px;margin-bottom:32px}
@@ -1387,6 +1388,7 @@ const DATA = {
       hi:"Mohammed", hi2:"Nouh",
       title:"Eng. Mohammed Nouh",
       roleShort:"Senior Architectural Engineer",
+      role2:"Project Manager",
       role:"Senior Architectural Engineer &amp; Project Manager",
       lede:"Senior Architect and Project Manager leading technical operations for Saudi mega-projects · including the Third Saudi Expansion of the Holy Mosque · alongside a decade of Hajj season operations leadership across Makkah services, housing, transport and reception.",
       cta1:"Get in touch", cta2:"View experience",
@@ -1663,6 +1665,7 @@ const DATA = {
       hi:"محمد", hi2:"نوح",
       title:"م. محمد نوح",
       roleShort:"مهندس معماري أول",
+      role2:"مدير مشاريع",
       role:"مهندس معماري أول ومدير مشاريع",
       lede:"مهندس معماري أول ومدير مشاريع يقود العمليات الفنية للمشاريع الوطنية الكبرى · من ضمنها التوسعة السعودية الثالثة للمسجد الحرام · إلى جانب خبرة تتجاوز العقد في قيادة عمليات مواسم الحج عبر خدمات مكة المكرمة والإسكان والنقل والاستقبال.",
       cta1:"تواصل معي", cta2:"استعرض الخبرات",
@@ -2084,7 +2087,7 @@ function render(lang){
     <div class="reveal">
       <span class="hero-badge"><span class="dot"></span>${d.hero.badge}</span>
       <h1>${d.hero.title}</h1>
-      <h2 class="role">${d.hero.roleShort}</h2>
+      <h2 class="role">${d.hero.roleShort}<span class="role-sep">|</span>${d.hero.role2}</h2>
       <div class="hr-thin"></div>
       <p class="lede">${d.hero.lede}</p>
       <div class="hero-cta">
