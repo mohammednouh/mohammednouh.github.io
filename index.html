@@ -1290,6 +1290,7 @@ body[data-theme="dark"]{
 .rec-group-label{display:flex;align-items:center;gap:16px;font-size:.74rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin:0 0 22px}
 .rec-group-label::after{content:"";height:1px;background:var(--line);flex:1}
 .rec-cta{text-align:center;margin-top:30px}
+.rec-cta-note{margin-top:12px;font-size:.8rem;color:var(--muted);max-width:440px;margin-inline:auto;line-height:1.6}
 </style>
 </head>
 <body>
@@ -1604,7 +1605,8 @@ const DATA = {
     recommend:{
       eyebrow:"Recommendations", title:["What colleagues ","say"],
       sub:"Endorsements from project leaders, mentors and university professors I have worked and studied with.",
-      more:"View all on LinkedIn",
+      more:"2 verified on LinkedIn",
+      moreNote:"The remaining recommendations are original signed and stamped paper letters, available on request.",
       proLabel:"Industry &amp; professional", acadLabel:"Academic mentors",
       items:[
         {group:"pro", photo:"majed", initials:"MA", name:"Majed Altir",
@@ -1881,7 +1883,8 @@ const DATA = {
     recommend:{
       eyebrow:"التوصيات", title:["ماذا يقول ","من عملوا معي"],
       sub:"توصيات من قادة المشاريع والمدرّبين وأساتذة الجامعة الذين عملتُ ودرستُ معهم.",
-      more:"عرض الكل على لينكدإن",
+      more:"توصيتان موثقتان على لينكدإن",
+      moreNote:"باقي التوصيات خطابات ورقية أصلية موقّعة ومختومة، متوفرة لدى المرشّح عند الطلب.",
       proLabel:"جهات العمل والقطاع المهني", acadLabel:"الأساتذة الأكاديميون",
       items:[
         {group:"pro", photo:"majed", initials:"MA", name:"ماجد الطير",
@@ -2269,6 +2272,7 @@ function render(lang){
     </div>`).join('')}
     <div class="rec-cta reveal">
       <a href="${LINKEDIN}details/recommendations/" target="_blank" rel="noopener" class="btn btn-ghost">${d.recommend.more}${IC.ext}</a>
+      <p class="rec-cta-note">${d.recommend.moreNote}</p>
     </div>
   </div></section>
 
@@ -3137,9 +3141,19 @@ window.pdfExport=async function(thenShare){
       /* html2canvas crops using the ORIGINAL element's box, so the clone must
          not be moved · only its painting normalised. Geometry options are left
          to the library. */
+      /* On phones the "real viewport" is ~360-430px wide, which is narrower
+         than every @media(max-width:...) breakpoint in this stylesheet. Those
+         rules were written for the visible responsive site, but they are not
+         scoped away from #pdfRoot · so on a mobile clone they silently shrank
+         fonts/padding inside the offscreen A4 sheet, which no longer matched
+         the heights the paginator measured at 794px, and the raster came out
+         with content compressed/cut. Floor the clone's width at a desktop
+         breakpoint so the sheet always renders in the same layout context it
+         was paginated in, on every device. */
       var canvas=await window.html2canvas(el,{
         scale:scale, backgroundColor:bg, useCORS:true, allowTaint:false, logging:false,
         imageTimeout:0, removeContainer:true, foreignObjectRendering:false,
+        windowWidth:Math.max(window.innerWidth||0, 1024),
         onclone:function(cdoc){
           /* freeze animations, force every reveal state open, and pin Tajawal so
              a half-loaded face can never be baked into the raster */
