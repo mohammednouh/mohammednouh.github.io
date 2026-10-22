@@ -808,6 +808,22 @@ html[dir="rtl"] .pdf-menu{transform-origin:top left}
   transition:opacity .25s var(--ease),transform .25s var(--ease),visibility .25s;pointer-events:none
 }
 .pdf-toast.open{opacity:1;visibility:visible;transform:translate(-50%,0)}
+/* CV chooser: language first, then actions */
+.cv-langs{display:grid;gap:9px;margin-bottom:14px}
+.cv-langs button{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--bg2);
+  color:var(--txt);font:inherit;cursor:pointer;text-align:start;
+  transition:border-color .2s var(--ease),background .2s var(--ease),transform .2s var(--ease)
+}
+.cv-langs button:hover,.cv-langs button:focus-visible{border-color:var(--teal);background:var(--teal-dim);transform:translateY(-1px);outline:none}
+.cv-langs b{font-weight:700;font-size:.95rem}
+.cv-langs small{color:var(--muted);font-size:.73rem;white-space:nowrap}
+.cv-tips{text-align:start;margin:2px 0 12px;font-size:.78rem;color:var(--muted);
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.cv-tips summary{cursor:pointer;font-weight:700;color:var(--txt)}
+.cv-tips ul{margin:8px 0 0;padding-inline-start:18px;line-height:1.75}
+.cv-tips b{color:var(--txt)}
 
 /* ============================================================
    A4 DOCUMENT
@@ -2441,7 +2457,19 @@ var T = {
     mobMail:'Request it by email', mobMailSub:'Ask Mohammed to send the CV directly',
     mobExport:'Export the full site instead', mobExportSub:'Every section, across as many A4 pages as it takes',
     cvReqSubject:'CV request', cvReqBody:'Hello Mohammed,\n\nCould you please send me a copy of your CV?\n\nThank you.',
-    cvReqWA:'Hello Mohammed, could you please send me a copy of your CV?'
+    cvReqWA:'Hello Mohammed, could you please send me a copy of your CV?',
+    cvLangQ:'Which language would you like?', cvLangSub:'Pick the CV version, then view, print, save or share it.',
+    cvBothLbl:'Arabic + English', cvPg2:'2 pages A4', cvPg4:'4 pages A4', cvBack:'Change language',
+    aView:'View', aPrint:'Print', aSave:'Save PDF', aShareFile:'Send the PDF file',
+    cvLinkMsg:'CV of Eng. Mohammed Nouh, Senior Architectural Engineer & Project Manager:',
+    cvMailBody:'Hello,\n\nHere is the CV of Eng. Mohammed Nouh, Senior Architectural Engineer & Project Manager. It opens on any phone or computer:',
+    printTip:'Opened. Tap Share, then Print.', opening:'Opening the CV',
+    tipsT:'How to use',
+    tips:['<b>View:</b> opens the CV in a new tab on any device.',
+          '<b>Print:</b> on a computer the print window opens directly. On a phone the file opens, then tap Share, then Print.',
+          '<b>Save PDF:</b> downloads the file. On iPhone open it, then Share, then Save to Files.',
+          '<b>WhatsApp / Email:</b> sends a direct link to the PDF. It opens on any phone or laptop.',
+          '<b>Send the PDF file:</b> on phones, attaches the file itself to any app.']
   },
   ar:{
     btn:'طباعة / تصدير PDF',
@@ -2478,7 +2506,19 @@ var T = {
     mobMail:'اطلبها عبر البريد', mobMailSub:'اطلب من محمد إرسال السيرة الذاتية مباشرة',
     mobExport:'أو صدّر الموقع كاملاً', mobExportSub:'كل الأقسام، بعدد الصفحات A4 الذي يلزم',
     cvReqSubject:'طلب السيرة الذاتية', cvReqBody:'السلام عليكم محمد،\n\nهل يمكن إرسال نسخة من سيرتك الذاتية؟\n\nشاكر لك.',
-    cvReqWA:'السلام عليكم محمد، هل يمكن إرسال نسخة من سيرتك الذاتية؟'
+    cvReqWA:'السلام عليكم محمد، هل يمكن إرسال نسخة من سيرتك الذاتية؟',
+    cvLangQ:'بأي لغة تريد السيرة الذاتية؟', cvLangSub:'اختر النسخة، ثم اعرضها أو اطبعها أو احفظها أو شاركها.',
+    cvBothLbl:'العربية + الإنجليزية', cvPg2:'صفحتان A4', cvPg4:'4 صفحات A4', cvBack:'تغيير اللغة',
+    aView:'عرض', aPrint:'طباعة', aSave:'حفظ PDF', aShareFile:'إرسال ملف PDF',
+    cvLinkMsg:'السيرة الذاتية للمهندس محمد نوح، مهندس معماري أول ومدير مشاريع:',
+    cvMailBody:'السلام عليكم،\n\nمرفق رابط السيرة الذاتية للمهندس محمد نوح، مهندس معماري أول ومدير مشاريع. يفتح من أي جوال أو كمبيوتر:',
+    printTip:'تم فتح الملف. اضغط مشاركة ثم طباعة.', opening:'جارٍ فتح السيرة الذاتية',
+    tipsT:'طريقة الاستخدام',
+    tips:['<b>عرض:</b> تفتح السيرة في تبويب جديد من أي جهاز.',
+          '<b>طباعة:</b> على الكمبيوتر تظهر نافذة الطباعة مباشرة. على الجوال يُفتح الملف، ثم اضغط مشاركة ثم طباعة.',
+          '<b>حفظ PDF:</b> يُحمَّل الملف. على الآيفون افتحه ثم مشاركة ثم حفظ في الملفات.',
+          '<b>واتساب / البريد:</b> يُرسل رابطاً مباشراً لملف PDF يفتح من أي جوال أو لابتوب.',
+          '<b>إرسال ملف PDF:</b> على الجوال يُرفق الملف نفسه في أي تطبيق.']
   }
 };
 
@@ -3397,6 +3437,119 @@ window.cvCopyLink=async function(){
   var url=pageURL(); if(!url) return;
   try{ await navigator.clipboard.writeText(url); toast(t().copied); }
   catch(e){ toast(t().copied); }
+};
+
+/* ============================================================
+   CV CHOOSER
+   The CV button asks for the language first (Arabic, English, or
+   both), then offers view, print, save, WhatsApp, email, copy link,
+   and on phones the native share sheet with the PDF file attached.
+   Shared links point straight at the PDF, so they open anywhere.
+   ============================================================ */
+var cvSel=null;
+function cvAbs(f){
+  try{ return new URL(f, /^https?:/i.test(location.href) ? location.href : SITE_URL).href; }
+  catch(e){ return f; }
+}
+function isTouch(){
+  try{ return window.matchMedia('(pointer:coarse)').matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+  catch(e){ return false; }
+}
+function openTab(href){
+  var a=document.createElement('a');
+  a.href=href; a.target='_blank'; a.rel='noopener';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+function canShareFiles(){
+  try{ return !!(navigator.canShare && navigator.canShare({files:[new File([''],'cv.pdf',{type:'application/pdf'})]})); }
+  catch(e){ return false; }
+}
+window.toggleCvMenu=function(ev){
+  if(ev) ev.stopPropagation();
+  menuOpen(false); cvMenuOpen(false);
+  cvPickLang();
+};
+window.cvPickLang=function(){
+  var x=t();
+  modal(''
+   + '<div class="pdf-done-ic">'+I.file+'</div>'
+   + '<h4>'+x.cvLangQ+'</h4>'
+   + '<p class="sub">'+x.cvLangSub+'</p>'
+   + '<div class="cv-langs">'
+   +   '<button onclick="cvChoose(\'ar\')"><b>العربية</b><small>'+x.cvPg2+'</small></button>'
+   +   '<button onclick="cvChoose(\'en\')"><b>English</b><small>'+x.cvPg2+'</small></button>'
+   +   '<button onclick="cvChoose(\'both\')"><b>'+x.cvBothLbl+'</b><small>'+x.cvPg4+'</small></button>'
+   + '</div>'
+   + '<button class="pdf-close" onclick="pdfCloseModal()">'+x.close+'</button>');
+};
+window.cvChoose=function(c){
+  var x=t(), site=(L()==='en'?'en':'ar');
+  var key = c==='both' ? site+'Both' : c;
+  cvSel={ file:CV_FILES[key], label: c==='ar' ? 'العربية' : c==='en' ? 'English' : x.cvBothLbl };
+  var b=function(fn,ic,txt,cls){ return '<button class="pdf-sbtn'+(cls?' '+cls:'')+'" onclick="'+fn+'">'+ic+'<span>'+txt+'</span></button>'; };
+  modal(''
+   + '<div class="pdf-file"><span class="fic">'+I.file+'</span><span>'
+   +   '<span class="fnm">'+cvSel.file+'</span><span class="fsz">'+cvSel.label+' · '+(c==='both'?x.cvPg4:x.cvPg2)+'</span></span></div>'
+   + '<div class="pdf-share-grid">'
+   +   b("cvAct('view')",  I.eye,     x.aView)
+   +   b("cvAct('print')", I.printer, x.aPrint)
+   +   b("cvAct('save')",  I.dl,      x.aSave)
+   +   b("cvAct('wa')",    I.wa,      x.wa, 'wa')
+   +   b("cvAct('mail')",  I.mail,    x.email)
+   +   b("cvAct('link')",  I.link,    x.copy)
+   +   (canShareFiles() ? b("cvAct('file')", I.share, x.aShareFile, 'wide') : '')
+   + '</div>'
+   + '<details class="cv-tips"><summary>'+x.tipsT+'</summary><ul><li>'+x.tips.join('</li><li>')+'</li></ul></details>'
+   + '<button class="pdf-close" onclick="cvPickLang()">'+x.cvBack+'</button>');
+};
+window.cvAct=function(a){
+  if(!cvSel) return;
+  var x=t(), f=cvSel.file, url=cvAbs(f);
+  if(a==='view'){ openTab(f); return; }
+  if(a==='save'){
+    var d=document.createElement('a'); d.href=f; d.download=f; d.rel='noopener';
+    document.body.appendChild(d); d.click(); document.body.removeChild(d);
+    toast(x.saved); return;
+  }
+  if(a==='print'){
+    if(isTouch()){ openTab(f); toast(x.printTip); return; }
+    toast(x.opening);
+    var old=$('cvPrintFrame'); if(old) old.remove();
+    var fr=document.createElement('iframe');
+    fr.id='cvPrintFrame'; fr.src=f;
+    fr.style.cssText='position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0';
+    fr.onload=function(){
+      setTimeout(function(){
+        try{ fr.contentWindow.focus(); fr.contentWindow.print(); }
+        catch(e){ openTab(f); }
+      },400);
+    };
+    document.body.appendChild(fr);
+    return;
+  }
+  if(a==='wa'){
+    openTab('https://wa.me/?text='+encodeURIComponent(x.cvLinkMsg+'\n'+url)); return;
+  }
+  if(a==='mail'){
+    location.href='mailto:?subject='+encodeURIComponent(x.subject)+'&body='+encodeURIComponent(x.cvMailBody+'\n'+url);
+    return;
+  }
+  if(a==='link'){
+    var done=function(){ toast(x.copied); };
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(url).then(done,function(){ window.prompt(x.copy,url); });
+    }else{ window.prompt(x.copy,url); }
+    return;
+  }
+  if(a==='file'){
+    fetch(f).then(function(r){ if(!r.ok) throw 0; return r.blob(); }).then(function(bl){
+      var file=new File([bl], f, {type:'application/pdf'});
+      return navigator.share({files:[file], title:x.subject, text:x.cvLinkMsg});
+    }).catch(function(e){
+      if(e && e.name==='AbortError') return;
+      if(navigator.share) navigator.share({title:x.subject, text:x.cvLinkMsg, url:url}).catch(function(){});
+    });
+  }
 };
 
 /* ============================================================
