@@ -3731,22 +3731,13 @@ window.cvDlgDownload=function(){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   toast(x.saved);
 };
-window.cvDlgPrint=async function(){
-  var x=t();
-  /* touch browsers (iOS/Android) don't honour the in-page print
-     stylesheet reliably through window.print() · hand them the real
-     CV file, whose own native viewer prints exactly its two pages
-     and nothing from the site behind it */
-  if(isTouchDevice()){
-    var f=CV_FILES[cvDlgLang]||cvFile(false);
-    var w=window.open(f,'_blank','noopener');
-    if(!w) toast(x.popup);
-    return;
-  }
-  var prevLang=currentLang;
-  currentLang=cvDlgLang;
-  try{ await window.pdfPrint(); }
-  finally{ currentLang=prevLang; }
+window.cvDlgPrint=function(){
+  /* always the real CV file · exactly its own pages (2 per language),
+     never the long multi-section site export. Opening it lets the
+     browser's own PDF viewer print just that file, on every device. */
+  var x=t(), f=CV_FILES[cvDlgLang]||cvFile(false);
+  var w=window.open(f,'_blank','noopener');
+  if(!w) toast(x.popup);
 };
 window.cvDlgShare=function(){ cvShareGeneric(); };
 document.addEventListener('keydown', function(e){
