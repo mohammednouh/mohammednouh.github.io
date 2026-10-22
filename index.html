@@ -791,8 +791,15 @@ html[dir="rtl"] .pdf-menu{transform-origin:top left}
 .cv-dlg-tools button:hover{border-color:var(--teal);background:var(--teal-dim);color:var(--teal)}
 .cv-dlg-tools button.x{padding:8px;width:36px;justify-content:center}
 .cv-dlg-tools svg{width:17px;height:17px;flex:0 0 auto}
-.cv-dlg-body{flex:1 1 auto;background:var(--bg2);overflow:hidden}
-.cv-dlg-body iframe{width:100%;height:100%;border:0;display:block}
+.cv-dlg-body{flex:1 1 auto;background:var(--bg2);overflow:auto;padding:22px 16px}
+.cv-dlg-stage{display:flex;justify-content:center}
+.cv-dlg-scale{position:relative;transform-origin:top center;flex:0 0 auto}
+.cv-dlg-scale #pdfRoot{position:static!important;left:auto!important;top:auto!important;
+  z-index:auto!important;pointer-events:auto!important;contain:none!important}
+.cv-dlg-scale .pdfpage{box-shadow:0 14px 40px rgba(0,0,0,.22);border-radius:3px;margin-bottom:22px}
+.cv-dlg-scale .pdfpage:last-child{margin-bottom:0}
+.cv-dlg-loading{display:flex;align-items:center;justify-content:center;min-height:240px;
+  color:var(--muted);font-size:.85rem}
 @media(max-width:620px){
   .cv-dlg{height:92vh;border-radius:14px}
   .cv-dlg-head{padding:10px 12px}
@@ -2525,7 +2532,9 @@ window.addEventListener('scroll',()=>{
         <button class="x" onclick="cvDlgClose()" aria-label="Close"></button>
       </div>
     </div>
-    <div class="cv-dlg-body"><iframe id="cvDlgFrame" title="CV"></iframe></div>
+    <div class="cv-dlg-body" id="cvDlgBody">
+      <div class="cv-dlg-stage" id="cvDlgStage"><div class="cv-dlg-scale" id="cvDlgScale"></div></div>
+    </div>
   </div>
 </div>
 
@@ -3545,22 +3554,54 @@ function cvDlgLabels(){
   tools[4].title = x.close;
   $('cvDlgTitle').textContent = x.subject;
 }
+function cvDlgFit(){
+  var stage=$('cvDlgStage'), scaleEl=$('cvDlgScale');
+  var doc = scaleEl.querySelector('.pdfdoc');
+  if(!doc) return;
+  var avail = Math.max(240, stage.clientWidth - 8);
+  var s = Math.min(1, avail/794);
+  var naturalH = doc.scrollHeight;
+  doc.style.transform='scale('+s+')';
+  doc.style.transformOrigin='top left';
+  scaleEl.style.width=(794*s)+'px';
+  scaleEl.style.height=(naturalH*s)+'px';
+}
+window.addEventListener('resize', function(){
+  var s=$('cvDlgScrim'); if(s && s.classList.contains('open')) cvDlgFit();
+});
+var cvDlgReq=0;
+async function cvDlgRender(){
+  var scaleEl=$('cvDlgScale'), reqId=++cvDlgReq;
+  scaleEl.innerHTML = '<div class="cv-dlg-loading">'+t().s1+'</div>';
+  await ensureFonts();
+  var prevLang=currentLang;
+  currentLang=cvDlgLang;
+  var built=buildDoc();
+  currentLang=prevLang;
+  await imagesReady(built.root);
+  await frame(); await frame();
+  if(reqId!==cvDlgReq){ var r=$('pdfRoot'); if(r) r.parentNode.removeChild(r); return; }
+  scaleEl.innerHTML='';
+  scaleEl.appendChild(built.root);
+  cvDlgFit();
+}
 window.cvViewNow=function(){
   cvDlgLang = (L()==='en' ? 'en' : 'ar');
-  $('cvDlgFrame').src = CV_FILES[cvDlgLang];
   cvDlgLabels();
   $('cvDlgScrim').classList.add('open');
   document.body.style.overflow='hidden';
+  cvDlgRender();
 };
 window.cvDlgClose=function(){
   $('cvDlgScrim').classList.remove('open');
   document.body.style.overflow='';
-  setTimeout(function(){ var f=$('cvDlgFrame'); if(f) f.src='about:blank'; },300);
+  cvDlgReq++;
+  setTimeout(function(){ var r=$('pdfRoot'); if(r) r.parentNode.removeChild(r); $('cvDlgScale').innerHTML=''; },300);
 };
 window.cvDlgToggleLang=function(){
   cvDlgLang = cvDlgLang==='en' ? 'ar' : 'en';
-  $('cvDlgFrame').src = CV_FILES[cvDlgLang];
   cvDlgLabels();
+  cvDlgRender();
 };
 window.cvDlgDownload=function(){
   var x=t(), f=CV_FILES[cvDlgLang]||cvFile(false);
@@ -3568,10 +3609,11 @@ window.cvDlgDownload=function(){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   toast(x.saved);
 };
-window.cvDlgPrint=function(){
-  var fr=$('cvDlgFrame');
-  try{ fr.contentWindow.focus(); fr.contentWindow.print(); }
-  catch(e){ var w=window.open(fr.src,'_blank','noopener'); if(!w) toast(t().popup); }
+window.cvDlgPrint=async function(){
+  var prevLang=currentLang;
+  currentLang=cvDlgLang;
+  try{ await window.pdfPrint(); }
+  finally{ currentLang=prevLang; }
 };
 window.cvDlgShare=function(){ cvShareGeneric(); };
 document.addEventListener('keydown', function(e){
